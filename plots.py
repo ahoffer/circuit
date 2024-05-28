@@ -26,5 +26,17 @@ def plot_velocity_and_magnetism(time, vel, mag):
     ax2.plot(time, mag, 'g', label='Magnetism (T)')
     ax2.set_xlabel('Time (s)')  # Set x-axis label to seconds
     ax2.set_ylabel('Magnetism (T)', color='g')
-    ax2.tick_params(axis='y', labelcolor='g')
+    ax2.tic_params(axis='y', labelcolor='g')
     plt.show()
+
+def start(f):
+    interact(
+        f,
+        V0=IntSlider(value=100, min=0, max=1000, step=5, description='V0 (Volts)'),
+        C=FloatLogSlider(value=0.01, base=10, min=-6, max=2, step=0.1, description='C (Farads)'),
+        R=FloatSlider(value=1, min=0.1, max=10, step=0.1, description='R'),
+        N=FloatSlider(value=100, min=1, max=1000, description='Turns'),
+        D=FloatSlider(value=.01, min=.001, max=.1, step=0.001, description='Diameter of coil (m)'),
+        l=FloatSlider(value=.06, min=.01, max=.3, step=0.01, description='Length of coil (m)'),
+        duration_s=FloatLogSlider(value=.2, base=10, min=-3, max=2, step=0.1, description='Duration')
+    )
