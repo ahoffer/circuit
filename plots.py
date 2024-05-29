@@ -1,12 +1,9 @@
 import matplotlib.pyplot as plt
 from ipywidgets import interact, FloatSlider, FloatLogSlider, IntSlider
 
-def plot_circuit(solution):
-    [voltage, current, acceleration] = solution.y
-    time_sim = solution.t
-    # Plot Current
+def plot_circuit(time, velocity, acceleration, voltage, current):
     plt.figure(figsize=(8, 4))
-    plt.plot(time_sim, current, 'r', label='Current (A)')
+    plt.plot(time, current, 'r', label='Current (A)')
     plt.xlabel('Time (s)')
     plt.ylabel('Current (A)')
     plt.legend()
@@ -14,19 +11,18 @@ def plot_circuit(solution):
     plt.grid(True)
     plt.tick_params(axis='y', labelcolor='r')
     plt.show()
-    return solution
 
-def plot_velocity_and_magnetism(time, vel, mag):
+def plot_velocity(time, vel):
     fig, ax1 = plt.subplots(figsize=(8, 3))
     ax1.plot(time, vel, 'm', label='Velocity (m/s)')
     ax1.set_xlabel('Time (s)')  # Set x-axis label to seconds
     ax1.set_ylabel('Velocity (m/s)', color='m')
     ax1.tick_params(axis='y', labelcolor='m')
-    ax2 = ax1.twinx()
-    ax2.plot(time, mag, 'g', label='Magnetism (T)')
-    ax2.set_xlabel('Time (s)')  # Set x-axis label to seconds
-    ax2.set_ylabel('Magnetism (T)', color='g')
-    ax2.tic_params(axis='y', labelcolor='g')
+    # ax2 = ax1.twinx()
+    # ax2.plot(time, mag, 'g', label='Magnetism (T)')
+    # ax2.set_xlabel('Time (s)')  # Set x-axis label to seconds
+    # ax2.set_ylabel('Magnetism (T)', color='g')
+    # ax2.tic_params(axis='y', labelcolor='g')
     plt.show()
 
 def start(f):
@@ -38,5 +34,7 @@ def start(f):
         N=FloatSlider(value=100, min=1, max=1000, description='Turns'),
         D=FloatSlider(value=.01, min=.001, max=.1, step=0.001, description='Diameter of coil (m)'),
         l=FloatSlider(value=.06, min=.01, max=.3, step=0.01, description='Length of coil (m)'),
+        sd=FloatSlider(value=0.005, min=0.001, max=.1, step=0.001, description='Diameter of slug (m)'),
+        sl=FloatSlider(value=0.020, min=0.0001, max=0.5, step=0.001, description='Length of slug (m)'),
         duration_s=FloatLogSlider(value=.2, base=10, min=-3, max=2, step=0.1, description='Duration')
     )
