@@ -9,7 +9,7 @@ def calculate_critical_resistance(L, C):
 def control_signal(t):
     # period = 2.0
     # return 1.0 if (t % period) < (period / 2) else 0.0\
-    seconds_of_power = 0.1 # 5ms
+    seconds_of_power = 0.05 # 5ms
     return t <= seconds_of_power
 
 # Define the differential equation for the LRC circuit with a MOSFET
