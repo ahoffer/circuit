@@ -36,7 +36,7 @@ print(f"Critical R: {R_crit}")
 R = R_crit * 0.6  # Resistance in Ohms
 
 # Time points where solution is computed
-t = np.linspace(0, 1, 100)
+t = np.linspace(0, .2, 100)
 
 # Solve the differential equations
 solution = odeint(lrc_circuit_with_mosfet, [V0, I0], t, args=(L, R, C, Vth, control_signal))
