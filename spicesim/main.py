@@ -1,30 +1,49 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.integrate import odeint
+
+
+# This model does not account for rise and fall times of the MOSFET,
+# or the rise time of the switch used to supply the gate voltage
+
 
 def calculate_critical_resistance(L, C):
     return 2 * np.sqrt(L / C)
 
+
 # Define the control signal for the MOSFET (example: a simple square wave)
-def control_signal(t):
+def V_GS_func(t):
     # period = 2.0
     # return 1.0 if (t % period) < (period / 2) else 0.0\
-    seconds_of_power = 0.05 # 5ms
+    seconds_of_power = 0.05  # 5ms
     return t <= seconds_of_power
 
+
+# Define the MOSFET behavior using Shockley equations
+def mosfet_current(V_GS, V_DS, V_th, k):
+    if V_GS <= V_th:
+        return 0  # Cutoff region
+    elif V_DS < V_GS - V_th:
+        return k * ((V_GS - V_th) * V_DS - 0.5 * V_DS ** 2)  # Linear region
+    else:
+        return 0.5 * k * (V_GS - V_th) ** 2  # Saturation region
+
+
 # Define the differential equation for the LRC circuit with a MOSFET
-def lrc_circuit_with_mosfet(y, t, L, R, C, Vth, control):
-    V, I = y
-    # Control signal to turn MOSFET on or off (1 for on, 0 for off)
-    mosfet_on = 1 if control(t) > Vth else 0
+def lrc_circuit_with_mosfet(y, t, L, R, C, Vth, k, V_GS_func):
+    V_circuit, I = y
+    V_GS = V_GS_func(t)
+    I_mosfet = mosfet_current(V_GS, V_circuit, Vth, k)
     dVdt = I
-    dIdt = (-R * I - V / C) / L if mosfet_on else 0
+    dIdt = (-R * I - V_circuit / C - I_mosfet) / L
     return [dVdt, dIdt]
+
 
 # Circuit parameters
 L = 1.0  # Inductance in Henry
 C = 1e-3  # Capacitance in Farads
-Vth = 0.5  # Threshold voltage for the MOSFET
+Vth = 2.0  # Threshold voltage for the MOSFET
+k = 0.01  # MOSFET transconductance parameter
 
 # Initial conditions: initial voltage and current
 V0 = -50.0  # Initial voltage in Volts
@@ -39,12 +58,12 @@ R = R_crit * 0.6  # Resistance in Ohms
 t = np.linspace(0, .2, 100)
 
 # Solve the differential equations
-solution = odeint(lrc_circuit_with_mosfet, [V0, I0], t, args=(L, R, C, Vth, control_signal))
+solution = odeint(lrc_circuit_with_mosfet, [V0, I0], t, args=(L, R, C, Vth, k, V_GS_func))
 V = solution[:, 0]
 I = solution[:, 1]
 
 # Calculate the control signal over time
-V_GS_values = [control_signal(time) for time in t]
+V_GS_values = [V_GS_func(time) for time in t]
 
 # Plot the results
 plt.figure(figsize=(10, 8))
